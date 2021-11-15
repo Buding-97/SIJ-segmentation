@@ -1,20 +1,16 @@
 """
     Modified from: https://github.com/charlesq34/pointnet/blob/master/sem_seg/indoor3d_util.py
 """
-import h5py
 import numpy as np
 import glob
 import os
-import paramiko
-import gc
-import sys
+import yaml
 
-
-DATA_PATH = '../Stanford3dDataset_v1.2_Aligned_Version/'
+# g_class2label ---> {'ceiling': 0, 'floor': 1, 'wall': 2, 'beam': 3, 'column': 4, 'window': 5, 'door': 6, 'chair': 7,
+# 'table': 8, 'bookcase': 9, 'sofa': 10, 'board': 11, 'clutter': 12}
+with open('../comfig.yaml','r',encoding='utf-8') as f:
+    args = yaml.load(f,Loader=yaml.FullLoader)
 g_classes = [x.rstrip() for x in open(os.path.join('../meta/s3dis_names.txt'))]
-# g_class2label --->  {'ceiling': 0, 'floor': 1, 'wall': 2, 'beam': 3, '
-# column': 4, 'window': 5, 'door': 6, 'chair': 7,  'table': 8,
-# 'bookcase': 9, 'sofa': 10, 'board': 11, 'clutter': 12}
 g_class2label = {cls: i for i, cls in enumerate(g_classes)}
 
 
@@ -40,8 +36,7 @@ def collect_point_label(anno_path, out_filename, file_format='txt'):
         labels = np.ones((points.shape[0], 1)) * g_class2label[cls]
         instancelabels = np.ones((points.shape[0], 1)) * instanceid
         instanceid += 1
-        points_list.append(np.concatenate([points, labels, instancelabels], 1))  # Nx8
-
+        points_list.append(np.concatenate([points, labels, instancelabels], 1)) #point*3 color*3 label instancelabel = 8
     data_label = np.concatenate(points_list, 0)
     xyz_min = np.amin(data_label, axis=0)[0:3]
     data_label[:, 0:3] -= xyz_min

@@ -1,12 +1,13 @@
 import os
 import sys
 from utils import indoor3d_util
+from utils.indoor3d_util import args
 
 anno_paths = [line.rstrip() for line in open('../meta/anno_paths.txt')]
-anno_paths = [os.path.join(indoor3d_util.DATA_PATH, p) for p in anno_paths]
+anno_paths = [os.path.join(indoor3d_util.args['DATA_PATH'], p) for p in anno_paths]
 output_folder = '../data/stanford_indoor3d_ins.sem'
 if not os.path.exists(output_folder):
-    os.mkdir(output_folder)
+    os.makedirs(output_folder)
 
 # Note: there is an extra character in the v1.2 data in Area_5/hallway_6. It's fixed manually.
 for anno_path in anno_paths:
@@ -19,3 +20,4 @@ for anno_path in anno_paths:
         indoor3d_util.collect_point_label(anno_path, os.path.join(output_folder, out_filename), 'numpy')
     except:
         print(anno_path, 'ERROR!')
+    exit()
