@@ -5,6 +5,8 @@ import numpy as np
 import glob
 import os
 import yaml
+from utils.tools import DataProcessing
+
 
 # g_class2label ---> {'ceiling': 0, 'floor': 1, 'wall': 2, 'beam': 3, 'column': 4, 'window': 5, 'door': 6, 'chair': 7,
 # 'table': 8, 'bookcase': 9, 'sofa': 10, 'board': 11, 'clutter': 12}
@@ -28,6 +30,7 @@ def collect_point_label(anno_path, out_filename, file_format='txt'):
     """
     points_list = []
     instanceid = 0
+    dict_ins2sem = {}
     for f in glob.glob(os.path.join(anno_path, '*.txt')):
         cls = os.path.basename(f).split('_')[0]
         if cls not in g_classes:  # note: in some room there is 'staris' class..
@@ -35,22 +38,30 @@ def collect_point_label(anno_path, out_filename, file_format='txt'):
         points = np.loadtxt(f)
         labels = np.ones((points.shape[0], 1)) * g_class2label[cls]
         instancelabels = np.ones((points.shape[0], 1)) * instanceid
+        dict_ins2sem[instanceid] = g_class2label[cls]
         instanceid += 1
         points_list.append(np.concatenate([points, labels, instancelabels], 1)) #point*3 color*3 label instancelabel = 8
     data_label = np.concatenate(points_list, 0)
     xyz_min = np.amin(data_label, axis=0)[0:3]
     data_label[:, 0:3] -= xyz_min
+    sub_xyz,sub_colors,sub_inslabels = DataProcessing.grid_sub_sampling(points=data_label[:,0:3].astype(np.float32),
+                                                                     features=data_label[:,3:6].astype(np.uint8),
+                                                                     labels=data_label[:,-1].astype(np.int32),
+                                                                     grid_size=0.02)
+    sub_colors = sub_colors / 255.0
+    sub_semlabels = np.array([dict_ins2sem[i] for i in np.squeeze(sub_inslabels)],dtype=np.int32)
+
 
     if file_format == 'txt':
         fout = open(out_filename, 'w')
         for i in range(data_label.shape[0]):
-            fout.write('%f %f %f %d %d %d %d\n' % \
-                       (data_label[i, 0], data_label[i, 1], data_label[i, 2],
-                        data_label[i, 3], data_label[i, 4], data_label[i, 5],
-                        data_label[i, 6]))
+            fout.write('%f %f %f %f %f %f %d %d\n' % \
+                       (sub_xyz[i, 0], sub_xyz[i, 1], sub_xyz[i, 2],
+                        sub_colors[i, 0], sub_colors[i, 0], sub_colors[i, 0],
+                        sub_semlabels[i], sub_inslabels[i]))
         fout.close()
     elif file_format == 'numpy':
-        np.save(out_filename, data_label)
+        np.save(out_filename, np.concatenate((sub_xyz,sub_colors,sub_semlabels[:,np.newaxis],sub_inslabels),axis=1))
     else:
         print('ERROR!! Unknown file format: %s, please use txt or numpy.' % file_format)
         exit()
