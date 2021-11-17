@@ -1,1 +1,5 @@
 DATA_PATH : '/home/lxb/DataSet/Stanford3dDataset_v1.2_Aligned_Version'
+NEW_DATA_PATH : '../data/stanford_indoor3d_ins.sem'
+cuda : Ture
+
+
