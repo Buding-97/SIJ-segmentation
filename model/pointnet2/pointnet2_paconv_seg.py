@@ -96,14 +96,14 @@ def model_fn_decorator(criterion):
 
 if __name__ == "__main__":
     import torch.optim as optim
-    B, N, C, K = 2, 4096, 3, 13
+    B, N, C, K = 1, 4096, 3, 13
     inputs = torch.randn(B, N, 6).cuda()
     labels = torch.randint(0, 3, (B, N)).cuda()
     model = PointNet2SSGSeg(c=C, k=K, args=dict()).cuda()
     optimizer = optim.SGD(model.parameters(), lr=5e-2, momentum=0.9, weight_decay=1e-4)
     print("Testing SSGCls with xyz")
     model_fn = model_fn_decorator(nn.CrossEntropyLoss())
-    for _ in range(5):
+    for _ in range(50):
         optimizer.zero_grad()
         _, loss, _ = model_fn(model, (inputs, labels))
         loss.backward()
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     optimizer = optim.SGD(model.parameters(), lr=5e-2, momentum=0.9, weight_decay=1e-4)
     print("Testing SSGCls without xyz")
     model_fn = model_fn_decorator(nn.CrossEntropyLoss())
-    for _ in range(5):
+    for _ in range(50):
         optimizer.zero_grad()
         _, loss, _ = model_fn(model, (inputs, labels))
         loss.backward()

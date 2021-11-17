@@ -1,5 +1,19 @@
-DATA_PATH : '/home/lxb/DataSet/Stanford3dDataset_v1.2_Aligned_Version'
-NEW_DATA_PATH : '../data/stanford_indoor3d_ins.sem'
-cuda : Ture
-
-
+#Data
+DATA_PATH: '/home/lxb/DataSet/Stanford3dDataset_v1.2_Aligned_Version'
+NEW_DATA_PATH: 'data/stanford_indoor3d_ins.sem'
+#Train
+fea_dim: 3 # point feature dimension
+cuda: Ture
+save_path: './checkpoint'
+classes: 13
+use_xyz: True
+base_lr: 0.05
+momentum: 0.9
+weight_decay: 0.0001
+multiplier: 0.1
+epochs: 100
+step_epoch: 30
+weight:  # path to initial weight (default: none)
+test_area : '5'
+correlation_loss: True
+train_workers: 8

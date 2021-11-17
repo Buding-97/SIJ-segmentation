@@ -2,10 +2,10 @@ import os
 import numpy as np
 import torch
 from torch.utils.data import Dataset
-from indoor3d_util import args
+from utils.indoor3d_util import args
 
 class S3DIS(Dataset):
-    def __init__(self, split='train', data_root=args['NEW_DATA_PATH'], test_area='5', fea_dim=6):
+    def __init__(self, split='train', data_root=args['NEW_DATA_PATH'], test_area='5'):
         super().__init__()
         self.data_root = data_root
         self.split = split
