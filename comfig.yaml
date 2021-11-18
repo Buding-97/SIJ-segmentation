@@ -4,7 +4,7 @@ NEW_DATA_PATH: 'data/stanford_indoor3d_ins.sem'
 #Train
 fea_dim: 3 # point feature dimension
 cuda: Ture
-train_cuda: [0,1,2,3]
+train_gpu: [0,1,2,3]
 sync_bn: True
 save_path: './checkpoint'
 classes: 13
