@@ -117,7 +117,7 @@ if __name__ == '__main__':
     logger = get_logger()
     writer = SummaryWriter(args['save_path'])
     model = Model(c=args['fea_dim'],k=args['classes'],use_xyz=args['use_xyz'],args=args).cuda()
-    if args.sync_bn:
+    if args['sync_bn']:
         from utils.tools import convert_to_syncbn
         convert_to_syncbn(model)
     sem_criterion = nn.CrossEntropyLoss().cuda()
