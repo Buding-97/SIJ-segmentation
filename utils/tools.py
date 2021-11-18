@@ -453,3 +453,19 @@ def intersectionAndUnionGPU(output, target, K, ignore_index=255):
     area_target = torch.histc(target.float().cpu(), bins=K, min=0, max=K-1)
     area_union = area_output + area_target - area_intersection
     return area_intersection.cuda(), area_union.cuda(), area_target.cuda()
+
+
+def convert_to_syncbn(model):
+    def recursive_set(cur_module, name, module):
+        if len(name.split('.')) > 1:
+            recursive_set(getattr(cur_module, name[:name.find('.')]), name[name.find('.')+1:], module)
+        else:
+            setattr(cur_module, name, module)
+    from lib.sync_bn import SynchronizedBatchNorm1d, SynchronizedBatchNorm2d, SynchronizedBatchNorm3d
+    for name, m in model.named_modules():
+        if isinstance(m, nn.BatchNorm1d):
+            recursive_set(model, name, SynchronizedBatchNorm1d(m.num_features, m.eps, m.momentum, m.affine))
+        elif isinstance(m, nn.BatchNorm2d):
+            recursive_set(model, name, SynchronizedBatchNorm2d(m.num_features, m.eps, m.momentum, m.affine))
+        elif isinstance(m, nn.BatchNorm3d):
+            recursive_set(model, name, SynchronizedBatchNorm3d(m.num_features, m.eps, m.momentum, m.affine))

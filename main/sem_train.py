@@ -110,9 +110,16 @@ def validate(val_loader, model, criterion):
 
 
 if __name__ == '__main__':
+    if args['train_gpu'] is not None:
+        os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(str(x) for x in args['train_gpu'])
+    if args['train_gpu'] is not None and len(args['train_gpu']) == 1:
+        args['sync_bn'] = False
     logger = get_logger()
     writer = SummaryWriter(args['save_path'])
     model = Model(c=args['fea_dim'],k=args['classes'],use_xyz=args['use_xyz'],args=args).cuda()
+    if args.sync_bn:
+        from utils.tools import convert_to_syncbn
+        convert_to_syncbn(model)
     sem_criterion = nn.CrossEntropyLoss().cuda()
     optimizer = torch.optim.SGD(model.parameters(),lr=args['base_lr'],momentum=args['momentum'],weight_decay=args['weight_decay'])
     if args.get('lr_multidecay',False):
@@ -123,7 +130,7 @@ if __name__ == '__main__':
     logger.info('---creating Model---')
     logger.info('Classes:{}'.format(args['classes']))
     logger.info(model)
-    # model = torch.nn.DataParallel(model.cuda())
+    model = torch.nn.DataParallel(model,device_ids=args['train_gpu']) # multi-GPU
     #----------------------------load_weight or resume-----------------------
     if args['weight']:
         if os.path.isfile(args['weight']):
