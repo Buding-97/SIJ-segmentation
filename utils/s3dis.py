@@ -33,7 +33,6 @@ class S3DIS(Dataset):
         self.label_to_idx = {l: i for i, l in enumerate(self.label_values)}
         self.val_split = 'Area_' + str(test_area)
         self.all_files = glob.glob(os.path.join(self.data_root, '*.npy'))
-        print(self.all_files)
         self.val_proj = []
         self.val_semlabels = []
         self.val_inslabels = []
@@ -99,7 +98,6 @@ class S3DIS(Dataset):
         cloud_idx = int(np.argmin(self.min_possibility[self.split]))
         # choose the point with the minimum of possibility in the cloud as query point
         point_ind = np.argmin(self.possibility[self.split][cloud_idx])
-        print(cloud_idx,point_ind)
         # Get all points within the cloud from tree structure
         points = np.array(self.input_trees[self.split][cloud_idx].data, copy=False)
         # Center point of input region
@@ -135,7 +133,10 @@ class S3DIS(Dataset):
             queried_pc_xyz, queried_pc_colors, queried_idx, queried_pc_semlabels, queried_pc_inslabels = \
                 DataProcessing.data_aug(queried_pc_xyz, queried_pc_colors, queried_pc_semlabels, queried_pc_inslabels, queried_idx, args['num_points'])
 
-        return queried_pc_xyz.astype(np.float32),queried_pc_colors.astype(np.float32),queried_pc_semlabels,queried_pc_inslabels
+        return torch.Tensor(queried_pc_xyz.astype(np.float32)),\
+               torch.Tensor(queried_pc_colors.astype(np.float32)),\
+               torch.Tensor(queried_pc_semlabels),\
+               torch.Tensor(queried_pc_inslabels)
 
     def __len__(self):
         return args['train_steps'] * args['batch_size'] if self.split == 'train' \
@@ -146,5 +147,5 @@ if __name__ == '__main__':
     s3dis = S3DIS()
     for i in range(len(s3dis)):
         a,b,c,d = s3dis[i]
-        print(c,d)
-        print(len(c),len(d))
+        print(a,b)
+        print((b.shape),type(b))

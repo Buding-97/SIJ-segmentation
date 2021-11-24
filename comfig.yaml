@@ -4,8 +4,9 @@ NEW_DATA_PATH: 'data/stanford_indoor3d_ins.sem'
 #Train
 fea_dim: 3 # point feature dimension
 cuda: Ture
-train_gpu: [0,1,2,3]
+train_gpu: [0]
 sync_bn: True
+ignore_label: 255
 save_path: './checkpoint'
 classes: 13
 use_xyz: True
@@ -18,10 +19,10 @@ step_epoch: 30
 weight:  # path to initial weight (default: none)
 test_area : '5'
 correlation_loss: True
-train_workers: 8
+train_workers: 4
 num_points: 40960  # Number of input points
-batch_size: 6  # batch_size during training
-val_batch_size: 20  # batch_size during validation and test
+batch_size: 2  # batch_size during training
+val_batch_size: 4  # batch_size during validation and test
 train_steps: 500  # Number of steps per epochs
 val_steps: 100  # Number of validation steps per epoch
 noise_init: 3.5  # noise initial parameter

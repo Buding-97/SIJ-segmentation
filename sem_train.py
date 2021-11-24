@@ -40,17 +40,16 @@ def train(train_loader,model, criterion, optimizer, epoch, correlation_loss):
     union_meter = AverageMeter()
     target_meter = AverageMeter()
     model.train()
-    for i,(points,sem_lable,_) in enumerate(tqdm(train_loader)):
+    for i,(points,colors, sem_lable,_) in enumerate(tqdm(train_loader)):
         points = points.float().cuda(non_blocking=True)
+        colors = colors.float().cuda(non_blocking=True)
         sem_lable = sem_lable.long().cuda(non_blocking=True)
-        print(points.shape)
-        print(sem_lable.shape)
-        sem_output = model(points)
+        sem_output = model(torch.concat((points,colors),dim=2))
         sem_loss = criterion(sem_output,sem_lable)
         corr_loss = 0.0
         corr_loss_scale = args.get('correlation_loss_scale',10.0)
         if correlation_loss:
-            for m in model.SA_modules.named_modules():
+            for m in model.module.SA_modules.named_modules():
                 if isinstance(m[-1],PAConv):
                     kernel_matrice, output_dim, m_dim = m[-1].weightbank, m[-1].output_dim, m[-1].m
                     new_kernel_matrice = kernel_matrice.view(-1, m_dim, output_dim).permute(1, 0, 2).reshape(m_dim, -1)
@@ -63,7 +62,7 @@ def train(train_loader,model, criterion, optimizer, epoch, correlation_loss):
         loss.backward()
         optimizer.step()
         sem_output = sem_output.max(1)[1]
-        intersection, union, target = intersectionAndUnionGPU(sem_output , sem_lable, args.classes, args.ignore_label)
+        intersection, union, target = intersectionAndUnionGPU(sem_output , sem_lable, args['classes'], args['ignore_label'])
         intersection, union, target = intersection.cpu().numpy(), union.cpu().numpy(), target.cpu().numpy()
         intersection_meter.update(intersection), union_meter.update(union), target_meter.update(target)
         loss_meter.update(loss.item(),points.size(0))
@@ -87,10 +86,11 @@ def validate(val_loader, model, criterion):
     target_meter = AverageMeter()
     model.eval()
     with torch.no_grad():
-        for i,(points,sem_lable,_) in enumerate(tqdm(val_loader)):
+        for i, (points, colors, sem_lable, _) in enumerate(tqdm(train_loader)):
             points = points.float().cuda(non_blocking=True)
+            colors = colors.float().cuda(non_blocking=True)
             sem_lable = sem_lable.long().cuda(non_blocking=True)
-            sem_output = model(points)
+            sem_output = model(torch.concat((points, colors), dim=2))
             sem_loss = criterion(sem_output,sem_lable)
             sem_output = sem_output.max(1)[1]
             intersection, union, target = intersectionAndUnionGPU(sem_output, sem_lable, args.classes, args.ignore_label)
@@ -142,8 +142,8 @@ if __name__ == '__main__':
             logger.info('no weight found at'.format(args['weight']))
     train_data = S3DIS(split='train', data_root=args['NEW_DATA_PATH'], test_area=args['test_area'])
     val_data = S3DIS(split='test', data_root=args['NEW_DATA_PATH'], test_area=args['test_area'])
-    train_loader = torch.utils.data.DataLoader(train_data, batch_size=1, shuffle=True, num_workers=args['train_workers'])
-    val_loader = torch.utils.data.DataLoader(val_data, batch_size=1, shuffle=False, num_workers=args['train_workers'])
+    train_loader = torch.utils.data.DataLoader(train_data, batch_size=args['batch_size'], shuffle=True, num_workers=args['train_workers'])
+    val_loader = torch.utils.data.DataLoader(val_data, batch_size=args['val_batch_size'], shuffle=False, num_workers=args['train_workers'])
     #----------------------------train-----------------------------------
     for epoch in range(args['epochs']):
         loss_train,mIou_train,mAcc_train,allAcc_train = train(train_loader, model, sem_criterion, optimizer, epoch, args.get('correlation_loss', False))

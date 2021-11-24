@@ -96,7 +96,7 @@ def model_fn_decorator(criterion):
 
 if __name__ == "__main__":
     import torch.optim as optim
-    B, N, C, K = 1, 4096, 3, 13
+    B, N, C, K = 1, 40960, 3, 13
     inputs = torch.randn(B, N, 6).cuda()
     labels = torch.randint(0, 3, (B, N)).cuda()
     model = PointNet2SSGSeg(c=C, k=K, args=dict()).cuda()

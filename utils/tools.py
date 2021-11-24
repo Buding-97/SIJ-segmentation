@@ -4,6 +4,7 @@ import os
 import sys
 import cpp_utils.cpp_wrappers.cpp_subsampling.grid_subsampling as cpp_subsampling
 import torch
+import torch.nn as nn
 
 
 class DataProcessing:
@@ -32,7 +33,7 @@ class DataProcessing:
 
 
     @staticmethod
-    def data_aug(xyz, color, labels, idx, num_out):
+    def data_aug(xyz, color, semlabels, inslabels, idx, num_out):
         num_in = len(xyz)
         dup = np.random.choice(num_in, num_out - num_in)
         xyz_dup = xyz[dup, ...]
@@ -41,8 +42,9 @@ class DataProcessing:
         color_aug = np.concatenate([color, color_dup], 0)
         idx_dup = list(range(num_in)) + list(dup)
         idx_aug = idx[idx_dup]
-        label_aug = labels[idx_dup]
-        return xyz_aug, color_aug, idx_aug, label_aug
+        semlabel_aug = semlabels[idx_dup]
+        inslabel_aug = inslabels[idx_dup]
+        return xyz_aug, color_aug, idx_aug, semlabel_aug, inslabel_aug
 
     @staticmethod
     def shuffle_idx(x):
