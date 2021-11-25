@@ -74,8 +74,8 @@ def train(train_loader,model, criterion, optimizer, epoch, correlation_loss):
     mAcc = np.mean(accuracy_class)
     allAcc = sum(intersection_meter.sum) / (sum(target_meter.sum) + 1e-10)
     logger.info('Loss result at epoch [{}/{}]: loss/sem_loss/ins_loss/corr_loss {:.4f}/{:.4f}/{:.4f}/{:.4f}'
-                .format(epoch+1,args.epochs,loss_meter.avg,sem_loss_meter.avg,ins_loss_meter.avg,corr_loss_meter.avg))
-    logger.info('Train result at epoch [{}/{}]: mIoU/mAcc/allAcc {:.4f}/{:.4f}/{:.4f}'.format(epoch+1,args.epochs,mIoU,mAcc,allAcc))
+                .format(epoch+1,args['epochs'],loss_meter.avg,sem_loss_meter.avg,ins_loss_meter.avg,corr_loss_meter.avg))
+    logger.info('Train result at epoch [{}/{}]: mIoU/mAcc/allAcc {:.4f}/{:.4f}/{:.4f}'.format(epoch+1,args['epochs'],mIoU,mAcc,allAcc))
     return loss_meter.avg,mIoU,mAcc,allAcc
 
 
@@ -86,14 +86,14 @@ def validate(val_loader, model, criterion):
     target_meter = AverageMeter()
     model.eval()
     with torch.no_grad():
-        for i, (points, colors, sem_lable, _) in enumerate(tqdm(train_loader)):
+        for i, (points, colors, sem_lable, _) in enumerate(tqdm(val_loader)):
             points = points.float().cuda(non_blocking=True)
             colors = colors.float().cuda(non_blocking=True)
             sem_lable = sem_lable.long().cuda(non_blocking=True)
             sem_output = model(torch.concat((points, colors), dim=2))
             sem_loss = criterion(sem_output,sem_lable)
             sem_output = sem_output.max(1)[1]
-            intersection, union, target = intersectionAndUnionGPU(sem_output, sem_lable, args.classes, args.ignore_label)
+            intersection, union, target = intersectionAndUnionGPU(sem_output, sem_lable, args['classes'], args['ignore_label'])
             intersection, union, target = intersection.cpu().numpy(), union.cpu().numpy(), target.cpu().numpy()
             intersection_meter.update(intersection), union_meter.update(union), target_meter.update(target)
             loss_meter.update(sem_loss.item(),points.size(0))
@@ -103,7 +103,7 @@ def validate(val_loader, model, criterion):
     mAcc = np.mean(accuracy_class)
     allAcc = sum(intersection_meter.sum) / (sum(target_meter.sum) + 1e-10)
     logger.info('Val result: mIoU/mAcc/allAcc {:.4f}/{:.4f}/{:.4f}.'.format(mIoU, mAcc, allAcc))
-    for i in range(args.classes):
+    for i in range(args['classes']):
         logger.info('Class_{} Result: iou/accuracy {:.4f}/{:.4f}.'.format(i, iou_class[i], accuracy_class[i]))
     logger.info('<<<<<<<<<<<<<<<<< End Evaluation <<<<<<<<<<<<<<<<<')
     return loss_meter.avg, mIoU, mAcc, allAcc
@@ -152,7 +152,7 @@ if __name__ == '__main__':
         writer.add_scalar('mIoU_train', mIou_train, epoch_log)
         writer.add_scalar('mAcc_train', mAcc_train, epoch_log)
         writer.add_scalar('allAcc_train',allAcc_train, epoch_log)
-        filename = args.save_path + '/{}_train_{}.pth'.format(args['test_area'],epoch_log)
+        filename = args['save_path'] + '/{}_train_{}.pth'.format(args['test_area'],epoch_log)
         logger.info('Best Model Saving checkpoint to {}'.format(filename))
         torch.save({'epoch': epoch_log, 'state_dict': model.state_dict(),
                     'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict()}, filename)
