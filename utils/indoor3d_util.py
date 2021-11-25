@@ -6,6 +6,8 @@ import glob
 import os
 import yaml
 from utils.tools import DataProcessing
+from sklearn.neighbors import KDTree
+import pickle
 
 
 # g_class2label ---> {'ceiling': 0, 'floor': 1, 'wall': 2, 'beam': 3, 'column': 4, 'window': 5, 'door': 6, 'chair': 7,
@@ -47,7 +49,7 @@ def collect_point_label(anno_path, out_filename, file_format='txt'):
     sub_xyz,sub_colors,sub_inslabels = DataProcessing.grid_sub_sampling(points=data_label[:,0:3].astype(np.float32),
                                                                      features=data_label[:,3:6].astype(np.uint8),
                                                                      labels=data_label[:,-1].astype(np.int32),
-                                                                     grid_size=0.02)
+                                                                     grid_size=0.04)
     sub_colors = sub_colors / 255.0
     sub_semlabels = np.array([dict_ins2sem[i] for i in np.squeeze(sub_inslabels)],dtype=np.int32)
 
@@ -61,7 +63,16 @@ def collect_point_label(anno_path, out_filename, file_format='txt'):
                         sub_semlabels[i], sub_inslabels[i]))
         fout.close()
     elif file_format == 'numpy':
-        np.save(out_filename, np.concatenate((sub_xyz,sub_colors,sub_semlabels[:,np.newaxis],sub_inslabels),axis=1))
+        np.save(out_filename + '.npy', np.concatenate((sub_xyz,sub_colors,sub_semlabels[:,np.newaxis],sub_inslabels),axis=1))
     else:
         print('ERROR!! Unknown file format: %s, please use txt or numpy.' % file_format)
         exit()
+
+    search_tree = KDTree(sub_xyz)
+    with open(out_filename + '_KDTree.pkl', 'wb') as f:
+        pickle.dump(search_tree, f)
+
+    proj_idx = np.squeeze(search_tree.query(data_label[:,0:3].astype(np.float32), return_distance=False))
+    proj_idx = proj_idx.astype(np.int32)
+    with open(out_filename + '_proj.pkl', 'wb') as f:
+        pickle.dump([proj_idx, data_label[:,-2].astype(np.int32), data_label[:,-1].astype(np.int32)], f)
