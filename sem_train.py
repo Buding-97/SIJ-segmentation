@@ -123,8 +123,8 @@ if __name__ == '__main__':
     sem_criterion = nn.CrossEntropyLoss().cuda()
     optimizer = torch.optim.SGD(model.parameters(),lr=args['base_lr'],momentum=args['momentum'],weight_decay=args['weight_decay'])
     if args.get('lr_multidecay',False):
-        scheduler = lr_scheduler.MultiStepLR(optimizer,milestones=[int(args['epochs'] * 0.6), int(args['epochs'] * 0.8)],
-                                             gamma=args['multiplier'])
+        scheduler = lr_scheduler.MultiStepLR(optimizer,milestones=[int(args['epochs'] * 0.4), int(args['epochs'] * 0.6),
+                                                                   int(args['epochs'] * 0.8)], gamma=args['multiplier'])
     else:
         scheduler = lr_scheduler.StepLR(optimizer, step_size=args['step_epoch'], gamma=args['multiplier'])
     logger.info('---creating Model---')
@@ -152,12 +152,12 @@ if __name__ == '__main__':
         writer.add_scalar('mIoU_train', mIou_train, epoch_log)
         writer.add_scalar('mAcc_train', mAcc_train, epoch_log)
         writer.add_scalar('allAcc_train',allAcc_train, epoch_log)
+        ######validate#########
+        loss_val, mIou_val, mAcc_val, allAcc_val = validate(val_loader, model, sem_criterion)
+        #######################
         filename = args['save_path'] + '/{}_train_{}.pth'.format(args['test_area'],epoch_log)
         logger.info('Best Model Saving checkpoint to {}'.format(filename))
         torch.save({'epoch': epoch_log, 'state_dict': model.state_dict(),
                     'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict()}, filename)
-        ######validate#########
-        loss_val,mIou_val,mAcc_val,allAcc_val = validate(val_loader,model,sem_criterion)
-        #######################
         scheduler.step()
     logger.info('Train Finish!')
