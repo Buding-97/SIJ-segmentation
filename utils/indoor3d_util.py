@@ -12,9 +12,9 @@ import pickle
 
 # g_class2label ---> {'ceiling': 0, 'floor': 1, 'wall': 2, 'beam': 3, 'column': 4, 'window': 5, 'door': 6, 'chair': 7,
 # 'table': 8, 'bookcase': 9, 'sofa': 10, 'board': 11, 'clutter': 12}
-with open('comfig.yaml','r',encoding='utf-8') as f:
+with open('../comfig.yaml','r',encoding='utf-8') as f:
     args = yaml.load(f,Loader=yaml.FullLoader)
-g_classes = [x.rstrip() for x in open(os.path.join('meta/s3dis_names.txt'))]
+g_classes = [x.rstrip() for x in open(os.path.join('../meta/s3dis_names.txt'))]
 g_class2label = {cls: i for i, cls in enumerate(g_classes)}
 
 

@@ -14,7 +14,7 @@ for anno_path in anno_paths:
     try:
         elements = anno_path.split('/')
         out_filename = '{}_{}'.format(elements[-3],elements[-2])  # Area_1_hallway_1
-        if os.path.exists(os.path.join(output_folder, out_filename)):
+        if os.path.exists(os.path.join(output_folder, out_filename + '.npy',)):
             continue
         indoor3d_util.collect_point_label(anno_path, os.path.join(output_folder, out_filename), 'numpy')
     except:
