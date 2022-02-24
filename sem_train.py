@@ -44,7 +44,7 @@ def train(train_loader,model, criterion, optimizer, epoch, correlation_loss):
         points = points.float().cuda(non_blocking=True)
         colors = colors.float().cuda(non_blocking=True)
         sem_lable = sem_lable.long().cuda(non_blocking=True)
-        sem_output = model(torch.concat((points,colors),dim=2))
+        sem_output = model(torch.cat((points,colors),dim=2))
         sem_loss = criterion(sem_output,sem_lable)
         corr_loss = 0.0
         corr_loss_scale = args.get('correlation_loss_scale',10.0)
@@ -90,7 +90,7 @@ def validate(val_loader, model, criterion):
             points = points.float().cuda(non_blocking=True)
             colors = colors.float().cuda(non_blocking=True)
             sem_lable = sem_lable.long().cuda(non_blocking=True)
-            sem_output = model(torch.concat((points, colors), dim=2))
+            sem_output = model(torch.cat((points, colors), dim=2))
             sem_loss = criterion(sem_output,sem_lable)
             sem_output = sem_output.max(1)[1]
             intersection, union, target = intersectionAndUnionGPU(sem_output, sem_lable, args['classes'], args['ignore_label'])
@@ -126,7 +126,7 @@ if __name__ == '__main__':
         scheduler = lr_scheduler.MultiStepLR(optimizer,milestones=[int(args['epochs'] * 0.4), int(args['epochs'] * 0.6),
                                                                    int(args['epochs'] * 0.8)], gamma=args['multiplier'])
     else:
-        scheduler = lr_scheduler.StepLR(optimizer, step_size=args['step_epoch'], gamma=args['multiplier'])
+        scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=args['epochs'])
     logger.info('---creating Model---')
     logger.info('Classes:{}'.format(args['classes']))
     logger.info(model)
