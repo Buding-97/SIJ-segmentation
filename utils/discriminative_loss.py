@@ -1,6 +1,6 @@
 """
 This is the implementation of following paper:
-https://arxiv.org/pdf/1802.05591.pdf
+https://arxiv.org/pdf/1708.02551.pdf
 """
 from torch.autograd import Variable
 import torch
@@ -72,7 +72,7 @@ class DiscriminativeLoss(nn.Module):
         var_term /= bs
         return var_term
 
-    def _distance_term(self, target,c_means):
+    def _distance_term(self, target, c_means):
         '''
         :param c_means: torch.size(B,5,4096)
         :return:
@@ -80,7 +80,7 @@ class DiscriminativeLoss(nn.Module):
         bs, n_features, num_points = c_means.size()
         dist_term = 0
         for i in range(bs):
-            num_cluster = torch.unique(target[i])
+            num_cluster = torch.unique(target[i]).long()
             mean_cluster = c_means[i][:,num_cluster]
             if mean_cluster.shape[1] <= 1:
                 continue
@@ -105,3 +105,19 @@ class DiscriminativeLoss(nn.Module):
             reg_term += torch.mean(torch.norm(mean_cluster, self.norm, 0))
         reg_term /= bs
         return reg_term
+
+if __name__ == '__main__':
+    points = torch.randn(16, 5, 4096).cuda()
+    target1 = torch.randint(0,3,(8,4096)).cuda()
+    target2 = torch.randint(7,8,(8,4096)).cuda()
+    # target3 = torch.randint(0,5,(16,4096)).cuda()
+    # print(points.shape,'line 115')
+    target = torch.cat((target1,target2),dim=0)
+    dis_meter = DiscriminativeLoss()
+    # criterion = nn.CrossEntropyLoss().cuda()
+    # loss_sem = criterion(points,target3)
+    print(target.shape)
+    loss_ins = dis_meter(points,target)
+    # print(loss_sem)
+    # print(target.type(),'line 122')
+    print(loss_ins,'line 123')
