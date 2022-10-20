@@ -10,7 +10,9 @@ from sklearn.neighbors import KDTree
 import pickle
 
 
-# g_class2label ---> {'ceiling': 0, 'floor': 1, 'wall': 2, 'beam': 3, 'column': 4, 'window': 5, 'door': 6, 'chair': 7,
+# g_class2label --->
+# {'ceiling': 0, 'floor': 1, 'wall': 2, 'beam': 3,
+# 'column': 4, 'window': 5, 'door': 6, 'chair': 7,
 # 'table': 8, 'bookcase': 9, 'sofa': 10, 'board': 11, 'clutter': 12}
 with open('comfig.yaml','r',encoding='utf-8') as f:
     args = yaml.load(f,Loader=yaml.FullLoader)

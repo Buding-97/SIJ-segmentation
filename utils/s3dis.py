@@ -145,7 +145,11 @@ class S3DIS(Dataset):
 
 if __name__ == '__main__':
     s3dis = S3DIS()
-    for i in range(len(s3dis)):
+    for i in range(150):
         a,b,c,d = s3dis[i]
-        print(a,b)
-        print((b.shape),type(b))
+        print(a.shape, a)
+        print(b.shape, b)
+        print(c.shape, c)
+        print(d.shape, d)
+        print(set(c.tolist()))
+        print(set(d.tolist()))

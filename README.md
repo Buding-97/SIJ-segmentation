@@ -6,14 +6,14 @@
 ## Operating environment
 ```text
 Ubuntu 18.04
-Pytorch 1.7
+Pytorch 1.7.1
 Nvidia GTX TITAN X 
 ```
 
 ## Dataset
 ```bash
 * Download 3D indoor parsing dataset (S3DIS Dataset). Version 1.2 of the dataset is used in this work.
-
+cd cpp_utils/cpp_wrappers & ./compile_wrappers.sh
 python utils/collect_indoor3d_data.py
 ```
 

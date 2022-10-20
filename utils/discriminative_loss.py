@@ -6,6 +6,7 @@ from torch.autograd import Variable
 import torch
 import torch.nn as nn
 
+
 class DiscriminativeLoss(nn.Module):
     def __init__(self, delta_var=0.5, delta_dist=1.5,
                  norm=1, alpha=1.0, beta=1.0, gamma=0.001,

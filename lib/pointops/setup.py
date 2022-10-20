@@ -7,7 +7,6 @@ setup(
     ext_modules=[
         CUDAExtension('pointops_cuda', [
             'src/pointops_api.cpp',
-
             'src/ballquery/ballquery_cuda.cpp',
             'src/ballquery/ballquery_cuda_kernel.cu',
             'src/knnquery/knnquery_cuda.cpp',
@@ -22,10 +21,8 @@ setup(
             'src/interpolation/interpolation_cuda_kernel.cu',
             'src/sampling/sampling_cuda.cpp',
             'src/sampling/sampling_cuda_kernel.cu',
-
             'src/labelstat/labelstat_cuda.cpp',
             'src/labelstat/labelstat_cuda_kernel.cu',
-
             'src/featuredistribute/featuredistribute_cuda.cpp',
             'src/featuredistribute/featuredistribute_cuda_kernel.cu'
         ],

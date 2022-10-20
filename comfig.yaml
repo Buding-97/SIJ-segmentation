@@ -1,10 +1,10 @@
 #Data
-DATA_PATH: '/home/lxb/DataSet/Stanford3dDataset_v1.2_Aligned_Version'
-NEW_DATA_PATH: 'data/stanford_indoor3d_ins.sem'
+DATA_PATH: '/home/liuxb/datasets/Stanford3dDataset_v1.2_Aligned_Version'
+NEW_DATA_PATH: './stanford_indoor3d_ins.sem'
 #Train
 fea_dim: 3 # point feature dimension
 cuda: Ture
-train_gpu: [0]
+train_gpu: [0,1,2,3]
 sync_bn: True
 ignore_label: 255
 save_path: './checkpoint'
@@ -14,15 +14,21 @@ base_lr: 0.05
 momentum: 0.9
 weight_decay: 0.0001
 multiplier: 0.1
-epochs: 100
-step_epoch: 30
-weight:  'checkpoint/pre_train.pth'# path to initial weight (default: none)
+epochs: 30
+step_epoch: 10
+weight:  './checkpoint/5_sem_pretrain.pth'  # path to initial weight (default: none)
 test_area : '5'
 correlation_loss: True
 train_workers: 4
-num_points: 40960  # Number of input points
+num_points: 4096  # Number of input points
 batch_size: 4  # batch_size during training
 val_batch_size: 4  # batch_size during validation and test
-train_steps: 500  # Number of steps per epochs
+train_steps: 1000  # Number of steps per epochs
 val_steps: 100  # Number of validation steps per epoch
-noise_init: 3.5  # noise initial parameter
+noise_init: 2  # noise initial parameter
+hidden_dim: 256
+dropout: 0.1
+nheads: 8
+dim_feedforward: 2048
+enc_layers: 6
+pre_norm: True

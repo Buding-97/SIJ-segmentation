@@ -4,7 +4,7 @@ from utils import indoor3d_util
 
 anno_paths = [line.rstrip() for line in open('../meta/anno_paths.txt')]
 anno_paths = [os.path.join(indoor3d_util.args['DATA_PATH'], p) for p in anno_paths]
-output_folder = '../data/stanford_indoor3d_ins.sem'
+output_folder = '../stanford_indoor3d_ins.sem'
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
@@ -17,6 +17,6 @@ for anno_path in anno_paths:
         if os.path.exists(os.path.join(output_folder, out_filename + '.npy',)):
             continue
         indoor3d_util.collect_point_label(anno_path, os.path.join(output_folder, out_filename), 'numpy')
-    except:
-        print(anno_path, 'ERROR!')
+    except Exception as e:
+        print(anno_path, 'ERROR!', e)
 print('collect over!')

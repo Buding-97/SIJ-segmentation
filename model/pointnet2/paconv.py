@@ -8,7 +8,6 @@ from lib.paconv_lib.functional import assign_score_withk as assign_score_cuda
 
 
 class ScoreNet(nn.Module):
-
     def __init__(self, in_channel, out_channel, hidden_unit=[8, 8], last_bn=False, temp=1):
         super(ScoreNet, self).__init__()
         self.hidden_unit = hidden_unit
