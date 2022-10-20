@@ -16,7 +16,7 @@ weight_decay: 0.0001
 multiplier: 0.1
 epochs: 50
 step_epoch: 10
-weight:  './checkpoint/5_sem_pretrain.pth'  # path to initial weight (default: none)
+weight:  none  # path to initial weight (default: none)
 test_area : '5'
 correlation_loss: True
 train_workers: 4
