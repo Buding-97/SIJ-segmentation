@@ -1,20 +1,15 @@
-import os,random
+import os
 from tqdm import tqdm
-import numpy as np
 import torch
-import torch.backends.cudnn as cudnn
-import torch.nn as nn
 import torch.nn.parallel
 import torch.optim
 import torch.utils.data
 import torch.optim.lr_scheduler as lr_scheduler
 from tensorboardX import SummaryWriter
 from model.pointnet2.pointnet2_paconv_seg import PointNet2INSSeg as Model
-from model.pointnet2.paconv import PAConv
 import logging
-import argparse
 from utils.indoor3d_util import args
-from utils.tools import AverageMeter,intersectionAndUnionGPU
+from utils.tools import AverageMeter
 from utils.s3dis import S3DIS
 from utils.discriminative_loss import DiscriminativeLoss
 
@@ -95,11 +90,9 @@ if __name__ == '__main__':
             logger.info('no weight found at'.format(args['weight']))
 
     train_data = S3DIS(split='train', data_root=args['NEW_DATA_PATH'], test_area=args['test_area'])
-    val_data = S3DIS(split='test', data_root=args['NEW_DATA_PATH'], test_area=args['test_area'])
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=args['batch_size'], shuffle=True,
                                                num_workers=args['train_workers'])
-    val_loader = torch.utils.data.DataLoader(val_data, batch_size=args['val_batch_size'], shuffle=False,
-                                             num_workers=args['train_workers'])
+
     #----------------------------train-----------------------------------
     for epoch in range(args['epochs']):
         loss_train = train(train_loader, model, criterion, optimizer, epoch)

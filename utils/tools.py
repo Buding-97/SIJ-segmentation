@@ -5,6 +5,7 @@ import sys
 import cpp_utils.cpp_wrappers.cpp_subsampling.grid_subsampling as cpp_subsampling
 import torch
 import torch.nn as nn
+from sklearn.cluster import MeanShift
 
 
 class DataProcessing:
@@ -199,24 +200,24 @@ def read_ply(filename, triangular_mesh=False):
 
     Examples
     --------
-    Store data in file
-
-    >>> points = np.random.rand(5, 3)
-    >>> values = np.random.randint(2, size=10)
-    >>> write_ply('example.ply', [points, values], ['x', 'y', 'z', 'values'])
-
-    Read the file
-
-    >>> data = read_ply('example.ply')
-    >>> values = data['values']
-    array([0, 0, 1, 1, 0])
-
-    >>> points = np.vstack((data['x'], data['y'], data['z'])).T
-    array([[ 0.466  0.595  0.324]
-           [ 0.538  0.407  0.654]
-           [ 0.850  0.018  0.988]
-           [ 0.395  0.394  0.363]
-           [ 0.873  0.996  0.092]])
+    # Store data in file
+    #
+    # >>> points = np.random.rand(5, 3)
+    # >>> values = np.random.randint(2, size=10)
+    # >>> write_ply('example.ply', [points, values], ['x', 'y', 'z', 'values'])
+    #
+    # Read the file
+    #
+    # >>> data = read_ply('example.ply')
+    # >>> values = data['values']
+    # array([0, 0, 1, 1, 0])
+    #
+    # >>> points = np.vstack((data['x'], data['y'], data['z'])).T
+    # array([[ 0.466  0.595  0.324]
+    #        [ 0.538  0.407  0.654]
+    #        [ 0.850  0.018  0.988]
+    #        [ 0.395  0.394  0.363]
+    #        [ 0.873  0.996  0.092]])
 
     """
 
@@ -303,15 +304,15 @@ def write_ply(filename, field_list, field_names, triangular_faces=None):
 
     Examples
     --------
-    >>> points = np.random.rand(10, 3)
-    >>> write_ply('example1.ply', points, ['x', 'y', 'z'])
-
-    >>> values = np.random.randint(2, size=10)
-    >>> write_ply('example2.ply', [points, values], ['x', 'y', 'z', 'values'])
-
-    >>> colors = np.random.randint(255, size=(10,3), dtype=np.uint8)
-    >>> field_names = ['x', 'y', 'z', 'red', 'green', 'blue', 'values']
-    >>> write_ply('example3.ply', [points, colors, values], field_names)
+    # >>> points = np.random.rand(10, 3)
+    # >>> write_ply('example1.ply', points, ['x', 'y', 'z'])
+    #
+    # >>> values = np.random.randint(2, size=10)
+    # >>> write_ply('example2.ply', [points, values], ['x', 'y', 'z', 'values'])
+    #
+    # >>> colors = np.random.randint(255, size=(10,3), dtype=np.uint8)
+    # >>> field_names = ['x', 'y', 'z', 'red', 'green', 'blue', 'values']
+    # >>> write_ply('example3.ply', [points, colors, values], field_names)
 
     """
 
@@ -471,3 +472,14 @@ def convert_to_syncbn(model):
             recursive_set(model, name, SynchronizedBatchNorm2d(m.num_features, m.eps, m.momentum, m.affine))
         elif isinstance(m, nn.BatchNorm3d):
             recursive_set(model, name, SynchronizedBatchNorm3d(m.num_features, m.eps, m.momentum, m.affine))
+
+
+def cluster(prediction, bandwidth):
+    ms = MeanShift(bandwidth)
+    ms.fit(prediction)
+    labels = ms.labels_
+    cluster_centers = ms.cluster_centers_
+
+    num_clusters = cluster_centers.shape[0]
+
+    return num_clusters, labels, cluster_centers

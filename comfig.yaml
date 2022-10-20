@@ -1,5 +1,5 @@
 #Data
-DATA_PATH: '/home/liuxb/datasets/Stanford3dDataset_v1.2_Aligned_Version'
+DATA_PATH: '~/datasets/Stanford3dDataset_v1.2_Aligned_Version' # the dir of dataset
 NEW_DATA_PATH: './stanford_indoor3d_ins.sem'
 #Train
 fea_dim: 3 # point feature dimension
@@ -14,15 +14,15 @@ base_lr: 0.05
 momentum: 0.9
 weight_decay: 0.0001
 multiplier: 0.1
-epochs: 30
+epochs: 50
 step_epoch: 10
 weight:  './checkpoint/5_sem_pretrain.pth'  # path to initial weight (default: none)
 test_area : '5'
 correlation_loss: True
 train_workers: 4
-num_points: 4096  # Number of input points
+num_points: 3072  # Number of input points
 batch_size: 4  # batch_size during training
-val_batch_size: 4  # batch_size during validation and test
+val_batch_size: 1  # batch_size during validation and test
 train_steps: 1000  # Number of steps per epochs
 val_steps: 100  # Number of validation steps per epoch
 noise_init: 2  # noise initial parameter
@@ -32,3 +32,5 @@ nheads: 8
 dim_feedforward: 2048
 enc_layers: 6
 pre_norm: True
+bandwidth: 0.6
+verbose: False
