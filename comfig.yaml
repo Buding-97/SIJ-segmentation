@@ -20,7 +20,7 @@ weight:  './checkpoint/5_sem_pretrain.pth'  # path to initial weight (default: n
 test_area : '5'
 correlation_loss: True
 train_workers: 4
-num_points: 3072  # Number of input points
+num_points: 4096  # Number of input points
 batch_size: 4  # batch_size during training
 val_batch_size: 1  # batch_size during validation and test
 train_steps: 1000  # Number of steps per epochs
