@@ -33,8 +33,6 @@ python main/ins_train.py
 ```
 <img height="50%" src="img/instance.png" width="50%"/>
 
-## Valuation
-Relevant code can refer to [JSNet](https://github.com/dlinzhao/JSNet)
 
 ## Result
 ![](img/vis_result.png)
